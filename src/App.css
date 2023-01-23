@@ -1,0 +1,64 @@
+.app {
+  height: 100vh;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  flex-direction: row;
+  margin: 10px 15px;
+  align-items: center;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+
+.title {
+  margin: 10px;
+  color: #1e272e;
+  display: block;
+}
+
+.container {
+  display: flex;
+  justify-content: stretch;
+  flex-direction: row;
+  flex: 1;
+}
+
+.col {
+  flex: 0.5;
+  padding: 10px;
+  display: flex;
+}
+
+.editor {
+  border: 1px solid #eee;
+  flex: 1;
+}
+
+.buttons {
+  flex-direction: row;
+  padding: 0 10px;
+}
+
+.control {
+  margin-right: 10px;
+}
+
+.button {
+  background-color: #575fcf;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 4px 10px;
+}
+
+input[type="checkbox"] {
+  accent-color: #575fcf;
+}
