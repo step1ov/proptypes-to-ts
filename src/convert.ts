@@ -27,44 +27,48 @@ const Convert = (code: string, isInterface: boolean): string => {
                 .replace(/,(?=[^()]*\))/g, ';');
             result = `${isInterface ? "export interface" : "type"} ${name} ${isInterface ? '' : '= '}{\n`
 
-            const elems = body.split(',');
+            const elems = body.split(',').filter(x => x);
 
             for (let i = 0; i < elems.length; i++) {
                 let elem = elems[i];
+
                 let isRequired = false;
                 if (elem.includes('.isRequired')){
                     isRequired = true;
                     elem = elem.replace('.isRequired', '');
                 }
-                const elemParts = elem.split(':');
-                let elemName = elemParts[0];
-                let elemType = elemParts[1];
 
-                result += '\t' + elemName;
-                if (!isRequired) result += '?';
-                result += ': ';
+                if (elem.includes(':')) {
+                    const elemParts = elem.split(':');
+                    let elemName = elemParts[0];
+                    let elemType = elemParts[1];
 
-                if (elemType.includes('oneOfType')){
-                    elemType = elemType
-                        .replace(/oneOfType|\(\[|]\)/gm, '')
-                        .split(';')
-                        .map(x => typesMap[x] ? typesMap[x] : 'any')
-                        .join(' | ');
-                } else {
-                    elemType = typesMap[elemType] ? typesMap[elemType] : 'any';
+                    result += '\t' + elemName;
+                    if (!isRequired) result += '?';
+                    result += ': ';
+
+                    if (elemType.includes('oneOfType')){
+                        elemType = elemType
+                            .replace(/oneOfType|\(\[|]\)/gm, '')
+                            .split(';')
+                            .map(x => typesMap[x] ? typesMap[x] : 'any')
+                            .join(' | ');
+                    } else {
+                        elemType = typesMap[elemType] ? typesMap[elemType] : 'any';
+                    }
+
+                    if (elemName === "children" && elemType !== "string") {
+                        elemType = "ReactNode";
+                    } else if (reservedTypes[elemName]) {
+                        elemType = reservedTypes[elemName];
+                    }
+
+                    result += elemType;
+                    if (i < elems.length - 1) {
+                        result += ',';
+                    }
+                    result += '\n';
                 }
-
-                if (elemName === "children" && elemType !== "string") {
-                    elemType = "ReactNode";
-                } else if (reservedTypes[elemName]) {
-                    elemType = reservedTypes[elemName];
-                }
-
-                result += elemType;
-                if (i < elems.length - 1) {
-                    result += ',';
-                }
-                result += '\n';
             }
 
             result += '}'
