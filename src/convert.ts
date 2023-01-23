@@ -14,6 +14,12 @@ const reservedTypes : Record<string, string> = {
     navigation: "NavigationProp<any, any>"
 }
 
+const extractType = (value: string) => {
+    if (typesMap[value]) return typesMap[value];
+    if (/"(.*?)"/g.test(value)) return value;
+    return 'any';
+}
+
 const Convert = (code: string, isInterface: boolean): string => {
     let result = '';
     if (code){
@@ -47,14 +53,19 @@ const Convert = (code: string, isInterface: boolean): string => {
                     if (!isRequired) result += '?';
                     result += ': ';
 
-                    if (elemType.includes('oneOfType')){
+                    if (elemType.includes('oneOfType')) {
                         elemType = elemType
                             .replace(/oneOfType|\(\[|]\)/gm, '')
                             .split(';')
-                            .map(x => typesMap[x] ? typesMap[x] : 'any')
+                            .map(x => extractType(x))
+                            .join(' | ');
+                    } else if (elemType.includes('oneOf')){
+                        elemType = elemType
+                            .replace(/oneOf|\(\[|]\)/gm, '')
+                            .split(';')
                             .join(' | ');
                     } else {
-                        elemType = typesMap[elemType] ? typesMap[elemType] : 'any';
+                        elemType = extractType(elemType);
                     }
 
                     if (elemName === "children" && elemType !== "string") {
